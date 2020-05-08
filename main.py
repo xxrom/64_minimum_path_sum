@@ -4,43 +4,44 @@ import sys
 
 class Solution:
 
-  def bfs(self, stack, minDistMap, checkMap) -> int:
-    print('--------------------------------')
-    print('stack', stack)
-    print('minDistMap', minDistMap)
-    print('checkMap', checkMap)
-    if len(stack) == 0:
-      print('end =)')
+  def bfs(self) -> int:
+    # print('--------------------------------')
+    print('stack', self.stack)
+    # print('minDistMap', self.minDistMap)
+    # print('checkMap', self.checkMap)
+    if len(self.stack) == 0:
+      # print('end =)')
       return 0
 
     # get first element coordinates from stack
-    i, j = stack.pop(0)
-    print('%d / %d' % (i, j))
+    i, j = self.stack.pop(0)
+    # print('%d / %d' % (i, j))
 
     bottomPosition = sys.maxsize
     rightPosition = sys.maxsize
-    if i + 1 < len(minDistMap):
-      bottomPosition = minDistMap[i + 1][j]
-    if j + 1 < len(minDistMap[0]):
-      rightPosition = minDistMap[i][j + 1]
+
+    if i + 1 < self.iSize:
+      bottomPosition = self.minDistMap[i + 1][j]
+    if j + 1 < self.jSize:
+      rightPosition = self.minDistMap[i][j + 1]
 
     currentMin = min(bottomPosition, rightPosition)
     if currentMin == sys.maxsize:
       currentMin = 0
 
-    minDistMap[i][j] += currentMin
+    self.minDistMap[i][j] += currentMin
 
-    if i - 1 >= 0 and checkMap[i - 1][j] != True:
-      checkMap[i - 1][j] = True
-      stack.append([i - 1, j])
-      print('added i -1 ', stack)
+    if i - 1 >= 0 and self.checkMap[i - 1][j] != True:
+      self.checkMap[i - 1][j] = True
+      self.stack.append([i - 1, j])
+      # print('added i -1 ', self.stack)
 
-    if j - 1 >= 0 and checkMap[i][j - 1] != True:
-      checkMap[i][j - 1] = True
-      stack.append([i, j - 1])
-      print('added j -1', stack)
+    if j - 1 >= 0 and self.checkMap[i][j - 1] != True:
+      self.checkMap[i][j - 1] = True
+      self.stack.append([i, j - 1])
+      # print('added j -1', self.stack)
 
-    self.bfs(stack, minDistMap, checkMap)
+    self.bfs()
 
   def minPathSum(self, grid: List[List[int]]) -> int:
     '''
@@ -52,21 +53,24 @@ class Solution:
         checkMap[i][j] = False
     '''
 
-    checkMap = []
-    for i in range(len(grid)):
-      checkMap.append([])
-      for j in range(len(grid[0])):
-        checkMap[i].append(False)
+    self.iSize = len(grid)
+    self.jSize = len(grid[0])
 
-    print('checkMap', checkMap)
+    self.checkMap = []
+    for i in range(self.iSize):
+      self.checkMap.append([])
+      for j in range(self.jSize):
+        self.checkMap[i].append(False)
 
-    minDistMap = grid[:]
-    stack = [[len(minDistMap) - 1, len(minDistMap[0]) - 1]]
-    self.bfs(stack, minDistMap, checkMap)
+    # print('self.checkMap', self.checkMap)
+
+    self.minDistMap = grid
+    self.stack = [[self.iSize - 1, self.jSize - 1]]
+    self.bfs()
     # print(minDistMap)
 
     # TODO: find path from the end to start, get min value and that all !!!
-    return minDistMap[0][0]
+    return self.minDistMap[0][0]
 
 
 my = Solution()
@@ -104,3 +108,19 @@ n = [
 
 # Runtime: 152 ms, faster than 26.33% of Python3 online submissions for Minimum Path Sum.
 # Memory Usage: 49.2 MB, less than 5.26% of Python3 online submissions for Minimum Path Sum.
+'''
+Fast solution (optimized solution =) )
+URL: https://leetcode.com/problems/minimum-path-sum/discuss/23466/Simple-python-dp-70ms
+
+def minPathSum(self, grid):
+    m = len(grid)
+    n = len(grid[0])
+    for i in range(1, n):
+        grid[0][i] += grid[0][i-1]
+    for i in range(1, m):
+        grid[i][0] += grid[i-1][0]
+    for i in range(1, m):
+        for j in range(1, n):
+            grid[i][j] += min(grid[i-1][j], grid[i][j-1])
+    return grid[-1][-1]
+'''
